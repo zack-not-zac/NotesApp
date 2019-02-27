@@ -11,11 +11,17 @@ public class Note {
     private int id;                         //id of each note in the database
 
     private String title;                   //note title
+    private String description;             //note body
     private int priority;                   //note priority
 
-    public Note(String title, int priority) {
+    public Note(String title, String description, int priority) {
         this.title = title;
+        this.description = description;
         this.priority = priority;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setId(int id) {
