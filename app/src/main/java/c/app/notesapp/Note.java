@@ -12,7 +12,9 @@ public class Note {
 
     private String title;                   //note title
     private String description;             //note body
-    private int priority;                   //note priority
+    private int priority;                   //note priority (Where it appears on the list)
+
+    //TODO: might be useful to add a date field if the application is to send reminder notifications - do more research
 
     public Note(String title, String description, int priority) {
         this.title = title;
@@ -20,6 +22,7 @@ public class Note {
         this.priority = priority;
     }
 
+    //getters and setters for the object
     public String getDescription() {
         return description;
     }

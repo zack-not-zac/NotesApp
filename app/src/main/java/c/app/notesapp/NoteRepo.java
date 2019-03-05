@@ -7,6 +7,7 @@ import java.util.List;
 
 import androidx.lifecycle.LiveData;
 
+//This repository is used to handle the multi-threading of the db tasks
 public class NoteRepo {
     private NoteDao noteDao;
     private LiveData<List<Note>> notes;
@@ -18,7 +19,7 @@ public class NoteRepo {
         notes = noteDao.viewAllNotes();
     }
 
-    //These are the functions visible to the app to create an abstraction layer
+    //These are the db functions visible to the rest of the app
     public void insert (Note note)
     {
         new InsertNoteAsyncTask(noteDao).execute(note);
@@ -34,7 +35,7 @@ public class NoteRepo {
         new DeleteNoteAsyncTask(noteDao).execute(note);
     }
 
-    public void deleteAll (Note note)
+    public void deleteAll ()
     {
         new DeleteAllAsyncTask(noteDao).execute();
     }
