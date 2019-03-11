@@ -24,6 +24,6 @@ public interface NoteDao {
     @Query("DELETE FROM note_table")
     void delete_all();
 
-    @Query("SELECT * FROM note_table ORDER BY priority DESC")
-    LiveData<List<Note>> viewAllNotes();            //using a LiveData List allows the application to be aware of when data in the list changes and auto-update the GUI
+    @Query("SELECT * FROM note_table ORDER BY id DESC") //will sort the database from newest to oldest
+    LiveData<List<Note>> viewAllNotes();                //using a LiveData List allows the application to be aware of when data in the list changes and auto-update the GUI
 }

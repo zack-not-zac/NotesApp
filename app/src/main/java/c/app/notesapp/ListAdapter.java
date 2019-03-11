@@ -28,7 +28,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.NoteViewHolder
         //sets the values of the TextViews in the note_layout
         holder.title_textview.setText(note.getTitle());
         holder.desc_textview.setText(note.getDescription());
-        holder.priority_textview.setText(String.valueOf(note.getPriority()));
     }
 
     @Override
@@ -45,13 +44,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.NoteViewHolder
     class NoteViewHolder extends RecyclerView.ViewHolder{
         private TextView title_textview;
         private TextView desc_textview;
-        private TextView priority_textview;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
             title_textview = itemView.findViewById(R.id.txtTitle);
             desc_textview = itemView.findViewById(R.id.txtDescription);
-            priority_textview = itemView.findViewById(R.id.txtPriority);
 
 
         }

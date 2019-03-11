@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/colorBackgroundDark"
+    android:background="@color/colorBackground"
     android:layout_gravity="center">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -13,6 +13,5 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp"
         tools:listitem="@layout/note_layout" />
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
