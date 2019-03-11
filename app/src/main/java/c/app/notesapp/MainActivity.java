@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
 
     @Override
     public void sendNoteFromCreateNote(Note newNote) {
-        shownotes.createNote(newNote);
-    }
+        shownotes.createNote(newNote);      //passes the data from the createnote fragment to the shownotes function to create the note
+    }                                       //this avoids duplication of variables or having to run parallel viewmodels which is far more complicated
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
