@@ -7,8 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -22,8 +20,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class fragment_shownotes extends Fragment {
     private NoteViewModel noteVM;           //variable for the viewmodel of the app
+    private EditNoteListener listener;
 
-    //defines a listener so that createnote fragment can send note data back to this fragment to be added to db
+    public interface EditNoteListener{
+        void editNoteFromNotes(Note editedNote);
+    }
 
     @Nullable
     @Override
@@ -52,11 +53,41 @@ public class fragment_shownotes extends Fragment {
 
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Notes");
 
+        adapter.setOnItemClickedListener(new ListAdapter.onItemClickedListener() {
+            @Override
+            public void onItemClick(Note note) {
+                listener.editNoteFromNotes(note);
+            }
+        });
+
         return v;
     }
 
     public void createNote(Note newNote){
+        //add if statement to check if item exists
         noteVM.insert(newNote);
-        Toast.makeText(getContext(), "Note Saved", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Note Saved", Toast.LENGTH_SHORT).show();      //takes the note from the createnote fragment and saves it to the db
     }
+
+
+    //for fragment communication
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if(context instanceof EditNoteListener)
+        {
+            listener = (EditNoteListener) context;
+        }
+        else        //throws an exception if the attached fragment does not implement the EditNoteListener
+        {
+            throw new RuntimeException(context.toString() + " must implement EditNoteListener!");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
 }

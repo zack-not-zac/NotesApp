@@ -18,9 +18,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 public class fragment_createnote extends Fragment {
-    private EditText editTexttitle;
+    private EditText editTextTitle;
     private EditText editTextDesc;
     private onNewNoteCreatedListener listener;
+    private View v;
 
     public interface onNewNoteCreatedListener{
         void sendNoteFromCreateNote(Note newNote);
@@ -31,7 +32,7 @@ public class fragment_createnote extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.createnote_layout,container,false);
 
-        editTexttitle = v.findViewById(R.id.edittxt_title);
+        editTextTitle = v.findViewById(R.id.edittxt_title);
         editTextDesc = v.findViewById(R.id.edittxt_description);
 
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Add New Note");
@@ -43,7 +44,7 @@ public class fragment_createnote extends Fragment {
 
     private void saveNote()
     {
-        String title = editTexttitle.getText().toString();
+        String title = editTextTitle.getText().toString();
         String desc = editTextDesc.getText().toString();
 
         if(title.trim().isEmpty() || desc.trim().isEmpty())     //dont save the note if it is empty (trim removes empty spaces)
@@ -57,10 +58,23 @@ public class fragment_createnote extends Fragment {
         listener.sendNoteFromCreateNote(newNote);
 
         //set edittext items back to empty once note has been saved
-        editTexttitle.setText("");
+        editTextTitle.setText("");
         editTextDesc.setText("");
     }
 
+    public void editNote(Note note)
+    {   //inserts the note data into the text views. The app then just calls saveNote as normal, then the DAO replaces the object if a conflict exists
+        //if it does exist, then the note will appear edited but it is actually just replaced. Otherwise, it will be created.
+        String title = note.getTitle();
+        String desc = note.getDescription();
+
+        editTextTitle.setText(title);
+        editTextDesc.setText(desc);
+
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Edit Note");
+    }
+
+    //for fragment communication
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -68,9 +82,9 @@ public class fragment_createnote extends Fragment {
         {
             listener = (onNewNoteCreatedListener) context;
         }
-        else        //throws an exception if the attached fragment does not implement the shownotes_listener
+        else        //throws an exception if the attached fragment does not implement the onNewNoteCreatedListener
         {
-            throw new RuntimeException(context.toString() + " must implement shownotes_listener!");
+            throw new RuntimeException(context.toString() + " must implement onNewNoteCreatedListener!");
         }
     }
 
@@ -80,6 +94,7 @@ public class fragment_createnote extends Fragment {
         listener = null;
     }
 
+    //for options menu
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.createnote_menu, menu);

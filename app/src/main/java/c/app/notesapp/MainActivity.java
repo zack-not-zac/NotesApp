@@ -1,6 +1,7 @@
 package c.app.notesapp;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
@@ -12,7 +13,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-public class MainActivity extends AppCompatActivity implements fragment_createnote.onNewNoteCreatedListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements fragment_createnote.onNewNoteCreatedListener, NavigationView.OnNavigationItemSelectedListener, fragment_shownotes.EditNoteListener {
     private DrawerLayout drawer;
     private fragment_shownotes shownotes;
     private fragment_createnote createnote;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //nav drawer stuff
+        //--------- nav drawer stuff ---------
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -61,6 +62,17 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     }                                       //this avoids duplication of variables or having to run parallel viewmodels which is far more complicated
 
     @Override
+    public void editNoteFromNotes(final Note editedNote) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();   //initialises the fragment
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
+            public void run() {                     //as before the data was being passed and set before the fragment fully initialised
+                createnote.editNote(editedNote);    //sets the fields to the current note to be edited
+            }
+        }, 50);   //50ms
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId())
         {
@@ -71,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
             case R.id.nav_notes:
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0)
                 {
-                    //this simply goes back to previous fragment as there are only 2 fragment options in the application
+                    //this simply goes back to previous fragment as there are only 2 fragment options in the application, and shownotes will always be first
                     getSupportFragmentManager().popBackStackImmediate();
                     break;
                 }
@@ -84,4 +96,5 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
 
         return true;
     }
+
 }

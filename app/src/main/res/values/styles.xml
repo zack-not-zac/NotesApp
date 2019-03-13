@@ -15,8 +15,8 @@
     </style>
 
     <style name="AppTheme.LighterEditText" parent="Widget.AppCompat.EditText">
-        <item name="colorControlActivated">@android:color/white</item>
-        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@color/colorPrimaryDark</item>
+        <item name="colorControlNormal">@color/colorPrimaryDark</item>
     </style>
 
 </resources>
