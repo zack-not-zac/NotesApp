@@ -2,6 +2,7 @@ package c.app.notesapp;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,11 +37,25 @@ public class fragment_createnote extends Fragment {
         editTextTitle = v.findViewById(R.id.edittxt_title);
         editTextDesc = v.findViewById(R.id.edittxt_description);
 
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Add New Note");
-
         setHasOptionsMenu(true);        //tells the system this fragment uses the OptionsMenu
 
         return v;
+    }
+
+    public void newNote()
+    //made this function so that clicking "Add New Note" in the navbar clears the text fields
+    {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
+            public void run() {                     //as before the data was being passed and set before the fragment fully initialised by MainAcitivity
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Add New Note");
+
+                editTextTitle.setText("");
+                editTextDesc.setText("");
+
+                id = -1;
+            }
+        }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
     }
 
     private void saveNote()
@@ -68,19 +83,25 @@ public class fragment_createnote extends Fragment {
         editTextDesc.setText("");
     }
 
-    public void editNote(Note note)
+    public void editNote(final Note note)
     {   //inserts the note data into the text views. The app then just calls saveNote as normal, then the DAO replaces the object if a conflict exists
         //if it does exist, then the note will appear edited but it is actually just replaced. Otherwise, it will be created.
-        String title = note.getTitle();
-        String desc = note.getDescription();
-        id = note.getId();
 
-        btn_delete.setVisible(true);        //shows the delete button if a note is being edited
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
+            public void run() {                     //as before the data was being passed and set before the fragment fully initialised
+                btn_delete.setVisible(true);        //shows the delete button if a note is being edited
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Edit Note");
 
-        editTextTitle.setText(title);
-        editTextDesc.setText(desc);
+                String title = note.getTitle();
+                String desc = note.getDescription();
+                id = note.getId();
 
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Edit Note");
+                editTextTitle.setText(title);
+                editTextDesc.setText(desc);
+            }
+        }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
+
     }
 
     private void deleteNote()

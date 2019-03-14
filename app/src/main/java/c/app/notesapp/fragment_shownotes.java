@@ -2,6 +2,7 @@ package c.app.notesapp;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,14 +64,24 @@ public class fragment_shownotes extends Fragment {
         return v;
     }
 
-    public void createNote(Note newNote){
-        noteVM.insert(newNote);     //db will just replace note if it exists, meaning that the app doesn't need to know if it exists already
-        Toast.makeText(getContext(), "Note Saved", Toast.LENGTH_SHORT).show();      //takes the note from the createnote fragment and saves it to the db
+    public void createNote(final Note newNote){
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
+            public void run() {                     //as before the data was being passed and set before the fragment fully initialised
+                noteVM.insert(newNote);     //db will just replace note if it exists, meaning that the app doesn't need to know if it exists already
+                Toast.makeText(getContext(), "Note Saved", Toast.LENGTH_SHORT).show();      //takes the note from the createnote fragment and saves it to the db
+            }
+        }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
     }
 
-    public void deleteNote(Note note){
-        noteVM.delete(note);
-        Toast.makeText(getContext(), "Note Deleted", Toast.LENGTH_SHORT).show();
+    public void deleteNote(final Note note){
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
+            public void run() {                     //as before the data was being passed and set before the fragment fully initialised
+                noteVM.delete(note);
+                Toast.makeText(getContext(), "Note Deleted", Toast.LENGTH_SHORT).show();
+            }
+        }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
     }
 
     //for fragment communication

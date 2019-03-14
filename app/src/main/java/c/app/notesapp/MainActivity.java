@@ -12,11 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
 
 public class MainActivity extends AppCompatActivity implements fragment_createnote.onNewNoteCreatedListener, NavigationView.OnNavigationItemSelectedListener, fragment_shownotes.EditNoteListener {
     private DrawerLayout drawer;
     private fragment_shownotes shownotes;
     private fragment_createnote createnote;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //--------- nav drawer stuff ---------
@@ -70,13 +72,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     @Override
     public void editNoteFromNotes(final Note editedNote) {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();   //initialises the fragment
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
-            public void run() {                     //as before the data was being passed and set before the fragment fully initialised
-                createnote.editNote(editedNote);    //sets the fields to the current note to be edited
-            }
-        }, 50);   //50ms delay to allow the fragment to fully initialise before running the editnote statement
+        createnote.editNote(editedNote);    //sets the fields to the current note to be edited
     }
 
     @Override
@@ -84,14 +80,20 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         switch(item.getItemId())
         {
             case R.id.nav_newnote:
-                //addToBackStack(null) means back button takes the user back to previous fragment
+                if (createnote.isVisible()) {
+                    //this clears the whole backstack if a user goes from editing a note to making a new note
+                    getSupportFragmentManager().popBackStackImmediate();
+                }
+                //then calls the fragment
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();
+                createnote.newNote();               //calls the newNote function to clear text fields
                 break;
             case R.id.nav_notes:
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0)
                 {
-                    //this simply goes back to previous fragment as there are only 2 fragment options in the application, and shownotes will always be first
-                    getSupportFragmentManager().popBackStackImmediate();
+                    //this clears the whole backstack to keep fragment management simple
+                    getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    navigationView.setCheckedItem(R.id.nav_notes);
                     break;
                 }
                 else
