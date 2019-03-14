@@ -8,3 +8,4 @@ Basic Notes application for Android (CMP 309 module)
 - Add notification reminders
 - Add fragment view to seperate thread to prevent stutters (?)
 - Add animations to hide text popping
+- Hide keyboard once user saves or deletes a note
