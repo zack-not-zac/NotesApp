@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
 
         if (savedInstanceState == null)
         {   //only runs this code if the app is running for the first time (instead of overwriting it if the device is replaced etc.)
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).addToBackStack(null).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).commit();
             navigationView.setCheckedItem(R.id.nav_notes);
         }
     }
@@ -57,19 +57,26 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     }
 
     @Override
-    public void sendNoteFromCreateNote(Note newNote) {
-        shownotes.createNote(newNote);      //passes the data from the createnote fragment to the shownotes function to create the note
-    }                                       //this avoids duplication of variables or having to run parallel viewmodels which is far more complicated
+    public void sendNoteFromCreateNote(Note note, boolean deleteNote) {
+        if (!deleteNote) {
+            shownotes.createNote(note);      //passes the data from the createnote fragment to the shownotes function to create the note
+        }                                       //this avoids duplication of variables or having to run parallel viewmodels which is far more complicated
+        else
+        {
+            shownotes.deleteNote(note);
+        }
+    }
 
     @Override
     public void editNoteFromNotes(final Note editedNote) {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();   //initialises the fragment
+
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
             public void run() {                     //as before the data was being passed and set before the fragment fully initialised
                 createnote.editNote(editedNote);    //sets the fields to the current note to be edited
             }
-        }, 50);   //50ms
+        }, 50);   //50ms delay to allow the fragment to fully initialise before running the editnote statement
     }
 
     @Override
@@ -96,5 +103,4 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
 
         return true;
     }
-
 }

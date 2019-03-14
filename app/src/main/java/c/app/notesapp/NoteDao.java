@@ -16,7 +16,7 @@ public interface NoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Note note);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void update (Note note);
 
     @Delete

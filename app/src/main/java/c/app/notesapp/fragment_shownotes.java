@@ -32,12 +32,12 @@ public class fragment_shownotes extends Fragment {
         View v = inflater.inflate(R.layout.shownotes_layout,container,false);
 
         RecyclerView recyclerView;      //variable for the recyclerView used to list the notes
+        final ListAdapter adapter = new ListAdapter();
 
         recyclerView = v.findViewById(R.id.note_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
         recyclerView.setHasFixedSize(true);
 
-        final ListAdapter adapter = new ListAdapter();
         recyclerView.setAdapter(adapter);
 
         noteVM = ViewModelProviders.of(this).get(NoteViewModel.class);
@@ -64,11 +64,14 @@ public class fragment_shownotes extends Fragment {
     }
 
     public void createNote(Note newNote){
-        //add if statement to check if item exists
-        noteVM.insert(newNote);
+        noteVM.insert(newNote);     //db will just replace note if it exists, meaning that the app doesn't need to know if it exists already
         Toast.makeText(getContext(), "Note Saved", Toast.LENGTH_SHORT).show();      //takes the note from the createnote fragment and saves it to the db
     }
 
+    public void deleteNote(Note note){
+        noteVM.delete(note);
+        Toast.makeText(getContext(), "Note Deleted", Toast.LENGTH_SHORT).show();
+    }
 
     //for fragment communication
     @Override

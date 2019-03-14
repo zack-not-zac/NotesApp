@@ -29,6 +29,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.NoteViewHolder
         //sets the values of the TextViews in the note_layout
         holder.title_textview.setText(note.getTitle());
         holder.desc_textview.setText(note.getDescription());
+        holder.id_textview.setText("ID: " + Integer.toString(note.getId()));        //TODO: remove this once debugging complete
     }
 
     @Override
@@ -41,14 +42,22 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.NoteViewHolder
         notifyDataSetChanged();
     }
 
+    public Note getNote(int pos)
+    {
+        Note note = notes.get(pos);
+        return note;
+    }
+
     class NoteViewHolder extends RecyclerView.ViewHolder {
         private TextView title_textview;
         private TextView desc_textview;
+        private TextView id_textview;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
             title_textview = itemView.findViewById(R.id.txtTitle);
             desc_textview = itemView.findViewById(R.id.txtDescription);
+            id_textview = itemView.findViewById(R.id.txtID);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

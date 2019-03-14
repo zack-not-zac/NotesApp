@@ -25,12 +25,21 @@ public class Note {
         return description;
     }
 
+    public void setDescription(String desc) {
+        this.description = desc;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
     }
 
     public int getId() {

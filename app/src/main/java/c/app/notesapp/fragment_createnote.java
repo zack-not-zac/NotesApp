@@ -15,16 +15,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 public class fragment_createnote extends Fragment {
     private EditText editTextTitle;
     private EditText editTextDesc;
     private onNewNoteCreatedListener listener;
     private View v;
+    private MenuItem btn_delete;
+    private int id = -1;
 
     public interface onNewNoteCreatedListener{
-        void sendNoteFromCreateNote(Note newNote);
+        void sendNoteFromCreateNote(Note newNote, boolean deleteNote);
     }
 
     @Nullable
@@ -55,7 +56,12 @@ public class fragment_createnote extends Fragment {
         //send note to shownotes to be saved in db
         Note newNote = new Note(title,desc);
 
-        listener.sendNoteFromCreateNote(newNote);
+        if(id != -1)
+        {
+            newNote.setId(id);      //sets the id if a note was passed into the editNote function
+        }
+
+        listener.sendNoteFromCreateNote(newNote, false);
 
         //set edittext items back to empty once note has been saved
         editTextTitle.setText("");
@@ -67,11 +73,30 @@ public class fragment_createnote extends Fragment {
         //if it does exist, then the note will appear edited but it is actually just replaced. Otherwise, it will be created.
         String title = note.getTitle();
         String desc = note.getDescription();
+        id = note.getId();
+
+        btn_delete.setVisible(true);        //shows the delete button if a note is being edited
 
         editTextTitle.setText(title);
         editTextDesc.setText(desc);
 
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Edit Note");
+    }
+
+    private void deleteNote()
+    {
+        String title = editTextTitle.getText().toString();
+        String desc = editTextDesc.getText().toString();
+
+        Note note = new Note(title,desc);
+
+        note.setId(id);
+
+        listener.sendNoteFromCreateNote(note, true);
+
+        //set edittext items back to empty once note has been deleted
+        editTextTitle.setText("");
+        editTextDesc.setText("");
     }
 
     //for fragment communication
@@ -98,17 +123,20 @@ public class fragment_createnote extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.createnote_menu, menu);
+        btn_delete = menu.findItem(R.id.delete_note_btn).setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()){
-            case R.id.save_note:
+            case R.id.save_note_btn:
                 saveNote();         //if the save button is clicked, then saveNote() is called
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                fm.popBackStackImmediate();
+                getActivity().getSupportFragmentManager().popBackStackImmediate();
                 return true;
+            case R.id.delete_note_btn:
+                deleteNote();
+                getActivity().getSupportFragmentManager().popBackStackImmediate();
             default:
                 return super.onOptionsItemSelected(item);
         }
