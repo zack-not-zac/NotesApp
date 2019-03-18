@@ -67,11 +67,16 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         {
             shownotes.deleteNote(note);
         }
+
+        navigationView.setCheckedItem(R.id.nav_notes);
     }
 
     @Override
     public void editNoteFromNotes(final Note editedNote) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();   //initialises the fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote)
+                .setCustomAnimations(R.anim.slide_in_fromright,R.anim.slide_out_up,R.anim.slide_in_fromright,R.anim.slide_out_up)
+                .addToBackStack(null).commit();   //initialises the fragment
+
         createnote.editNote(editedNote);    //sets the fields to the current note to be edited
     }
 
@@ -85,7 +90,9 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
                     getSupportFragmentManager().popBackStackImmediate();
                 }
                 //then calls the fragment
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote)
+                        .setCustomAnimations(R.anim.slide_in_fromright,R.anim.slide_out_up,R.anim.slide_in_fromright,R.anim.slide_out_up)
+                        .addToBackStack(null).commit();
                 createnote.newNote();               //calls the newNote function to clear text fields
                 break;
             case R.id.nav_notes:

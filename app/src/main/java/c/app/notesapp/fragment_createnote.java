@@ -68,19 +68,20 @@ public class fragment_createnote extends Fragment {
             Toast.makeText(getContext(), "Cannot add an empty note!", Toast.LENGTH_SHORT).show();
             return;
         }
-        //send note to shownotes to be saved in db
-        Note newNote = new Note(title,desc);
+        else {
+            //send note to shownotes to be saved in db
+            Note newNote = new Note(title, desc);
 
-        if(id != -1)
-        {
-            newNote.setId(id);      //sets the id if a note was passed into the editNote function
+            if (id != -1) {
+                newNote.setId(id);      //sets the id if a note was passed into the editNote function
+            }
+
+            listener.sendNoteFromCreateNote(newNote, false);
+
+            //set edittext items back to empty once note has been saved
+            editTextTitle.setText("");
+            editTextDesc.setText("");
         }
-
-        listener.sendNoteFromCreateNote(newNote, false);
-
-        //set edittext items back to empty once note has been saved
-        editTextTitle.setText("");
-        editTextDesc.setText("");
     }
 
     public void editNote(final Note note)
