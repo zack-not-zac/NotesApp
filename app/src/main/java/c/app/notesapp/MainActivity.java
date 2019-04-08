@@ -1,7 +1,6 @@
 package c.app.notesapp;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
@@ -14,7 +13,11 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
-public class MainActivity extends AppCompatActivity implements fragment_createnote.onNewNoteCreatedListener, NavigationView.OnNavigationItemSelectedListener, fragment_shownotes.EditNoteListener {
+public class MainActivity extends AppCompatActivity implements
+        fragment_createnote.onNewNoteCreatedListener,
+        NavigationView.OnNavigationItemSelectedListener,
+        fragment_shownotes.EditNoteListener {
+
     private DrawerLayout drawer;
     private fragment_shownotes shownotes;
     private fragment_createnote createnote;

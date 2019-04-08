@@ -21,7 +21,6 @@ public class fragment_createnote extends Fragment {
     private EditText editTextTitle;
     private EditText editTextDesc;
     private onNewNoteCreatedListener listener;
-    private View v;
     private MenuItem btn_delete;
     private int id = -1;
 
@@ -159,6 +158,10 @@ public class fragment_createnote extends Fragment {
             case R.id.delete_note_btn:
                 deleteNote();
                 getActivity().getSupportFragmentManager().popBackStackImmediate();
+                return true;
+            case R.id.location_btn:
+                //TODO: call function to set pin at current location
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
