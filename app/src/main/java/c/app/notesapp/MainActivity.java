@@ -1,6 +1,7 @@
 package c.app.notesapp;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
@@ -11,17 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
 
-public class MainActivity extends AppCompatActivity implements
-        fragment_createnote.onNewNoteCreatedListener,
-        NavigationView.OnNavigationItemSelectedListener,
-        fragment_shownotes.EditNoteListener {
-
+public class MainActivity extends AppCompatActivity implements fragment_createnote.onNewNoteCreatedListener, NavigationView.OnNavigationItemSelectedListener, fragment_shownotes.EditNoteListener {
     private DrawerLayout drawer;
     private fragment_shownotes shownotes;
     private fragment_createnote createnote;
-    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //--------- nav drawer stuff ---------
@@ -43,9 +38,8 @@ public class MainActivity extends AppCompatActivity implements
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        if (savedInstanceState == null)
-        {   //only runs this code if the app is running for the first time (instead of overwriting it if the device is replaced etc.)
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).commit();
+        if (savedInstanceState == null) {   //only runs this code if the app is running for the first time (instead of overwriting it if the device is replaced etc.)
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).addToBackStack(null).commit();
             navigationView.setCheckedItem(R.id.nav_notes);
         }
     }
@@ -70,17 +64,18 @@ public class MainActivity extends AppCompatActivity implements
         {
             shownotes.deleteNote(note);
         }
-
-        navigationView.setCheckedItem(R.id.nav_notes);
     }
 
     @Override
     public void editNoteFromNotes(final Note editedNote) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote)
-                .setCustomAnimations(R.anim.slide_in_fromright,R.anim.slide_out_up,R.anim.slide_in_fromright,R.anim.slide_out_up)
-                .addToBackStack(null).commit();   //initialises the fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();   //initialises the fragment
 
-        createnote.editNote(editedNote);    //sets the fields to the current note to be edited
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
+            public void run() {                     //as before the data was being passed and set before the fragment fully initialised
+                createnote.editNote(editedNote);    //sets the fields to the current note to be edited
+            }
+        }, 50);   //50ms delay to allow the fragment to fully initialise before running the editnote statement
     }
 
     @Override
@@ -88,22 +83,14 @@ public class MainActivity extends AppCompatActivity implements
         switch(item.getItemId())
         {
             case R.id.nav_newnote:
-                if (createnote.isVisible()) {
-                    //this clears the whole backstack if a user goes from editing a note to making a new note
-                    getSupportFragmentManager().popBackStackImmediate();
-                }
-                //then calls the fragment
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote)
-                        .setCustomAnimations(R.anim.slide_in_fromright,R.anim.slide_out_up,R.anim.slide_in_fromright,R.anim.slide_out_up)
-                        .addToBackStack(null).commit();
-                createnote.newNote();               //calls the newNote function to clear text fields
+                //addToBackStack(null) means back button takes the user back to previous fragment
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();
                 break;
             case R.id.nav_notes:
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0)
                 {
-                    //this clears the whole backstack to keep fragment management simple
-                    getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    navigationView.setCheckedItem(R.id.nav_notes);
+                    //this simply goes back to previous fragment as there are only 2 fragment options in the application, and shownotes will always be first
+                    getSupportFragmentManager().popBackStackImmediate();
                     break;
                 }
                 else

@@ -1,5 +1,7 @@
 package c.app.notesapp;
 
+import android.location.Location;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -12,6 +14,7 @@ public class Note {
 
     private String title;                   //note title
     private String description;             //note body
+    private String location = null;
 
     //TODO: might be useful to add a date field if the application is to send reminder notifications - do more research
 
@@ -44,5 +47,15 @@ public class Note {
 
     public int getId() {
         return id;
+    }
+
+    public void setLocation(String location)
+    {
+        this.location = location;
+    }
+
+    public String getLocation()
+    {
+        return location;
     }
 }
