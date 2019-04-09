@@ -120,7 +120,14 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
 
             if (deviceLocation != null)
             {
-                newNote.setLocation(deviceLocation.toString());
+                double latitude;
+                double longitude;
+
+                latitude = deviceLocation.getLatitude();
+                longitude = deviceLocation.getLongitude();
+
+                String location = String.valueOf(latitude) + "," + String.valueOf(longitude);
+                newNote.setLocation(location);
             }
 
             listener.sendNoteFromCreateNote(newNote, false);
@@ -220,6 +227,7 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
                         deviceLocation = location;
                     }
                 });
+                mapView.setVisibility(View.VISIBLE);        //shows the map once the button is clicked.
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -252,7 +260,7 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        map.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Test Marker"));
+        map.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Test Marker"));      //TODO: remove this after debugging
         map.setMyLocationEnabled(true);
     }
 

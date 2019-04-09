@@ -14,7 +14,7 @@ public class Note {
 
     private String title;                   //note title
     private String description;             //note body
-    private String location = null;
+    private String location = null;         //location stored in form: LATITUDE,LONGITUDE
 
     //TODO: might be useful to add a date field if the application is to send reminder notifications - do more research
 
