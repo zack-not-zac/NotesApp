@@ -32,4 +32,11 @@
         android:inputType="textMultiLine"
         android:textColor="@android:color/white" />
 
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/note_mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/edittxt_description"
+        android:visibility="gone"/>
+
 </RelativeLayout>

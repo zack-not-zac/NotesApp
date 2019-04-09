@@ -18,21 +18,38 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-public class fragment_createnote extends Fragment {
+public class fragment_createnote extends Fragment implements OnMapReadyCallback {
+
+    //for UI stuff
     private EditText editTextTitle;
     private EditText editTextDesc;
-    private onNewNoteCreatedListener listener;
     private MenuItem btn_delete;
+
+    //For fragment communication
+    private onNewNoteCreatedListener listener;
+
+    //used when editing notes
     private int id = -1;
+
+    //for mapview & location
     private FusedLocationProviderClient locationProviderClient;
     private Location deviceLocation = null;
+    private MapView mapView;
+    private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     public interface onNewNoteCreatedListener {
         void sendNoteFromCreateNote(Note newNote, boolean deleteNote);
@@ -45,12 +62,28 @@ public class fragment_createnote extends Fragment {
 
         editTextTitle = v.findViewById(R.id.edittxt_title);
         editTextDesc = v.findViewById(R.id.edittxt_description);
+        mapView = v.findViewById(R.id.note_mapView);
 
         locationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+
+        GoogleMapInit(savedInstanceState);
 
         setHasOptionsMenu(true);        //tells the system this fragment uses the OptionsMenu
 
         return v;
+    }
+
+    //Maps code based on tutorial from: https://www.youtube.com/watch?v=118wylgD_ig
+    private void GoogleMapInit(Bundle savedInstanceState)
+    {
+        Bundle mapViewBundle = null;
+        if(savedInstanceState != null)
+        {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+        mapView.onCreate(mapViewBundle);
+
+        mapView.getMapAsync(this);
     }
 
     public void newNote()
@@ -109,7 +142,13 @@ public class fragment_createnote extends Fragment {
 
                 String title = note.getTitle();
                 String desc = note.getDescription();
+                desc = desc.concat("\n " + note.getLocation()); //TODO: Adds location text to note desc - remove after debugging
                 id = note.getId();
+
+                if (note.getLocation() != null )
+                {
+                    mapView.setVisibility(View.VISIBLE);
+                }
 
                 editTextTitle.setText(title);
                 editTextDesc.setText(desc);
@@ -173,7 +212,7 @@ public class fragment_createnote extends Fragment {
             case R.id.location_btn: //take current lattitude and longitude and save it to deviceLocation variable
                 //location code based on tutorial from: https://www.youtube.com/watch?v=XQJiiuk8Feo
                 if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getContext(),"Cannot access location. Check location services and try again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(),"Cannot access location. Check location permissions in your system settings and try again!", Toast.LENGTH_SHORT).show();
                 }
                 locationProviderClient.getLastLocation().addOnSuccessListener((Activity) getContext(), new OnSuccessListener<Location>() {
                     @Override
@@ -187,5 +226,51 @@ public class fragment_createnote extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        map.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Test Marker"));
+        map.setMyLocationEnabled(true);
+    }
+
+    @Override
+    public void onPause() {
+        mapView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        mapView.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
 }

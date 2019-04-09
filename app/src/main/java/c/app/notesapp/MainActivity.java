@@ -1,8 +1,10 @@
 package c.app.notesapp;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -10,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -17,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     private DrawerLayout drawer;
     private fragment_shownotes shownotes;
     private fragment_createnote createnote;
+    private static final int PERMISSION_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        request_permissions();
+
         //--------- nav drawer stuff ---------
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -41,6 +47,15 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         if (savedInstanceState == null) {   //only runs this code if the app is running for the first time (instead of overwriting it if the device is replaced etc.)
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).addToBackStack(null).commit();
             navigationView.setCheckedItem(R.id.nav_notes);
+        }
+    }
+
+    public void request_permissions() {
+        if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) && ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            Toast.makeText(this, "Cannot access location. You will not be able to save location pins in notes.", Toast.LENGTH_LONG).show();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
         }
     }
 
@@ -59,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     public void sendNoteFromCreateNote(Note note, boolean deleteNote) {
         if (!deleteNote) {
             shownotes.createNote(note);      //passes the data from the createnote fragment to the shownotes function to create the note
-        }                                       //this avoids duplication of variables or having to run parallel viewmodels which is far more complicated
+        }                                    //this avoids duplication of variables or having to run parallel viewmodels which is far more complicated
         else
         {
             shownotes.deleteNote(note);
