@@ -42,6 +42,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.NoteViewHolder
         notifyDataSetChanged();
     }
 
+    public void removeItem(Note note)
+    {
+        for(int x = 0; x < notes.size(); x++)
+        {
+            if((notes.get(x)).getId() == note.getId())
+            {
+                notifyItemRemoved(x);
+            }
+        }
+    }
+
     public Note getNote(int pos)
     {
         Note note = notes.get(pos);

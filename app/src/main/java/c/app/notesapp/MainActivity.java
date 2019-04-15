@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -26,11 +27,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
 
 public class MainActivity extends AppCompatActivity implements fragment_createnote.onNewNoteCreatedListener, NavigationView.OnNavigationItemSelectedListener, fragment_shownotes.EditNoteListener {
     private DrawerLayout drawer;
     private fragment_shownotes shownotes;
     private fragment_createnote createnote;
+    private NavigationView navigationView;
 
     //location variables. Location code based off tutorial from: https://www.youtube.com/watch?v=1f4b2-Y_q2A&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=4
     private static final int PERMISSIONS_REQUEST_ENABLE_GPS = 1;
@@ -51,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //--------- nav drawer stuff ---------
@@ -65,13 +68,14 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
 
         if (savedInstanceState == null) {   //only runs this code if the app is running for the first time (instead of overwriting it if the lifecycle is replaced etc.)
             Log.d(TAG, "Building shownotes fragment...");
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).addToBackStack(null).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).commit();
             navigationView.setCheckedItem(R.id.nav_notes);
         }
     }
 
     private Boolean checkMapServices()
     {
+
         Log.d(TAG,"checkMapServices...");
         if(isServicesEnabled())
         {
@@ -134,6 +138,10 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
             drawer.closeDrawer(GravityCompat.START);
         }
         else {
+            if(createnote.isVisible())
+            {
+                navigationView.setCheckedItem(R.id.nav_notes);
+            }
             super.onBackPressed();
         }
     }
@@ -147,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         {
             shownotes.deleteNote(note);
         }
+        navigationView.setCheckedItem(R.id.nav_notes);
     }
 
     @Override
@@ -167,13 +176,19 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         {
             case R.id.nav_newnote:
                 //addToBackStack(null) means back button takes the user back to previous fragment
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();
+                //runs on a new thread to prevent stuttering
+                new Thread(new Runnable() {
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();
+                    }
+                }).start();
                 break;
             case R.id.nav_notes:
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0)
                 {
-                    //this simply goes back to previous fragment as there are only 2 fragment options in the application, and shownotes will always be first
-                    getSupportFragmentManager().popBackStackImmediate();
+                    //this clears the backstack then goes back to the shownotes fragment to prevent a huge backstack
+                    getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).commit();
                     break;
                 }
                 else
@@ -185,4 +200,5 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
 
         return true;
     }
+
 }

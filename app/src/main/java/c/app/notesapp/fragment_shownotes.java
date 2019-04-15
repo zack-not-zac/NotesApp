@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class fragment_shownotes extends Fragment {
     private NoteViewModel noteVM;           //variable for the viewmodel of the app
     private EditNoteListener listener;
+    private ListAdapter adapter;
 
     public interface EditNoteListener{
         void editNoteFromNotes(Note editedNote);
@@ -33,7 +34,7 @@ public class fragment_shownotes extends Fragment {
         View v = inflater.inflate(R.layout.shownotes_layout,container,false);
 
         RecyclerView recyclerView;      //variable for the recyclerView used to list the notes
-        final ListAdapter adapter = new ListAdapter();
+        adapter = new ListAdapter();
 
         recyclerView = v.findViewById(R.id.note_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
@@ -80,6 +81,7 @@ public class fragment_shownotes extends Fragment {
             public void run() {                     //as before the data was being passed and set before the fragment fully initialised
                 noteVM.delete(note);
                 Toast.makeText(getContext(), "Note Deleted", Toast.LENGTH_SHORT).show();
+                adapter.removeItem(note);
             }
         }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
     }
