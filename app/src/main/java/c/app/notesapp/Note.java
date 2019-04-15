@@ -14,7 +14,8 @@ public class Note {
 
     private String title;                   //note title
     private String description;             //note body
-    private String location = null;         //location stored in form: LATITUDE,LONGITUDE
+    private double latitude = 0.0;         //location latitude
+    private double longitude = 0.0;        //location longitude
 
     //TODO: might be useful to add a date field if the application is to send reminder notifications - do more research
 
@@ -49,13 +50,25 @@ public class Note {
         return id;
     }
 
-    public void setLocation(String location)
+    //Location stuff
+
+    public void setLatitude(double latitude)
     {
-        this.location = location;
+        this.latitude = latitude;
     }
 
-    public String getLocation()
+    public double getLatitude()
     {
-        return location;
+        return latitude;
+    }
+
+    public void setLongitude(double longitude)
+    {
+        this.longitude = longitude;
+    }
+
+    public double getLongitude()
+    {
+        return longitude;
     }
 }

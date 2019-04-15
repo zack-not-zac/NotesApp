@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
@@ -122,14 +123,8 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
 
             if (deviceLocation != null)
             {
-                double latitude;
-                double longitude;
-
-                latitude = deviceLocation.getLatitude();
-                longitude = deviceLocation.getLongitude();
-
-                String location = String.valueOf(latitude) + "," + String.valueOf(longitude);
-                newNote.setLocation(location);
+                newNote.setLatitude(deviceLocation.getLatitude());
+                newNote.setLongitude(deviceLocation.getLongitude());
             }
 
             listener.sendNoteFromCreateNote(newNote, false);
@@ -151,12 +146,16 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
 
                 String title = note.getTitle();
                 String desc = note.getDescription();
-                desc = desc.concat("\n " + note.getLocation()); //TODO: Adds location text to note desc - remove after debugging
+
                 id = note.getId();
 
-                if (note.getLocation() != null )
+                if (note.getLatitude() != 0.0 && note.getLongitude() != 0.0)
                 {
+                    LatLng pos = new LatLng(note.getLatitude(),note.getLongitude());
+
                     mapView.setVisibility(View.VISIBLE);
+                    note_googleMap.addMarker(new MarkerOptions().position(pos).title(note.getTitle()));
+                    note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 20));    //zooms in on a specific part of the map
                 }
 
                 editTextTitle.setText(title);
@@ -226,10 +225,15 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
                 locationProviderClient.getLastLocation().addOnSuccessListener((Activity) getContext(), new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
+                        mapView.setVisibility(View.VISIBLE);        //shows the map once the button is clicked.
+
+                        LatLng pos = new LatLng(location.getLatitude(),location.getLongitude());
+                        note_googleMap.addMarker(new MarkerOptions().position(pos).title("New Marker"));
+                        note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 20));     //zooms in on a specific part of the map
+
                         deviceLocation = location;
                     }
                 });
-                mapView.setVisibility(View.VISIBLE);        //shows the map once the button is clicked.
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -263,8 +267,9 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
             return;
         }
 
-        map.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Test Marker"));      //TODO: remove this after debugging
-        map.setMyLocationEnabled(true);
+        note_googleMap = map;
+
+        note_googleMap.setMyLocationEnabled(true);
     }
 
     @Override
