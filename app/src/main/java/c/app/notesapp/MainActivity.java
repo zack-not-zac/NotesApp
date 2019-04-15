@@ -1,18 +1,29 @@
 package c.app.notesapp;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -20,7 +31,13 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     private DrawerLayout drawer;
     private fragment_shownotes shownotes;
     private fragment_createnote createnote;
-    private static final int PERMISSION_REQUEST_CODE = 1;
+
+    //location variables. Location code based off tutorial from: https://www.youtube.com/watch?v=1f4b2-Y_q2A&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=4
+    private static final int PERMISSIONS_REQUEST_ENABLE_GPS = 1;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
+    private static final int ERROR_DIALOG_REQUEST = 3;
+    private boolean isLocationPermissionGranted = false;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,25 +54,76 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        request_permissions();
-
         //--------- nav drawer stuff ---------
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        if (savedInstanceState == null) {   //only runs this code if the app is running for the first time (instead of overwriting it if the device is replaced etc.)
+        while(!isLocationPermissionGranted) {
+            request_permissions();
+        }
+
+        if (savedInstanceState == null) {   //only runs this code if the app is running for the first time (instead of overwriting it if the lifecycle is replaced etc.)
+            Log.d(TAG, "Building shownotes fragment...");
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).addToBackStack(null).commit();
             navigationView.setCheckedItem(R.id.nav_notes);
         }
     }
 
+    private Boolean checkMapServices()
+    {
+        Log.d(TAG,"checkMapServices...");
+        if(isServicesEnabled())
+        {
+            Log.d(TAG,"Services Enabled.");
+            if(isMapsEnabled())
+            {
+                Log.d(TAG,"Maps Enabled.");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isMapsEnabled(){
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            Toast.makeText(this,"Unable to contact location services, please check your settings and try again.",Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isServicesEnabled(){
+        Log.d(TAG, "isServicesEnabled: checking google services version");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+
+        if(!(available == ConnectionResult.SUCCESS)){
+            Toast.makeText(this, "Unable to contact Google Services. Check your location services and try again", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            //an error occured but we can resolve it
+            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+            return false;
+        }
+
+        return true;
+    }
+
     public void request_permissions() {
-        if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) && ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            Toast.makeText(this, "Cannot access location. You will not be able to save location pins in notes.", Toast.LENGTH_LONG).show();
-        } else {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
+        if (checkMapServices()) {
+            if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            } else {
+                isLocationPermissionGranted = true;
+                Log.d(TAG,"Location permissions granted.");
+            }
         }
     }
 
