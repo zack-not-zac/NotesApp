@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        while(!isLocationPermissionGranted) {
+        while (!isLocationPermissionGranted) {
             request_permissions();
         }
 
@@ -73,42 +73,38 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         }
     }
 
-    private Boolean checkMapServices()
-    {
+    private Boolean checkMapServices() {
 
-        Log.d(TAG,"checkMapServices...");
-        if(isServicesEnabled())
-        {
-            Log.d(TAG,"Services Enabled.");
-            if(isMapsEnabled())
-            {
-                Log.d(TAG,"Maps Enabled.");
+        Log.d(TAG, "checkMapServices...");
+        if (isServicesEnabled()) {
+            Log.d(TAG, "Services Enabled.");
+            if (isMapsEnabled()) {
+                Log.d(TAG, "Maps Enabled.");
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isMapsEnabled(){
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+    public boolean isMapsEnabled() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            Toast.makeText(this,"Unable to contact location services, please check your settings and try again.",Toast.LENGTH_LONG).show();
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Toast.makeText(this, "Unable to contact location services, please check your settings and try again.", Toast.LENGTH_LONG).show();
             return false;
         }
         return true;
     }
 
-    public boolean isServicesEnabled(){
+    public boolean isServicesEnabled() {
         Log.d(TAG, "isServicesEnabled: checking google services version");
 
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
 
-        if(!(available == ConnectionResult.SUCCESS)){
+        if (!(available == ConnectionResult.SUCCESS)) {
             Toast.makeText(this, "Unable to contact Google Services. Check your location services and try again", Toast.LENGTH_LONG).show();
             return false;
-        }
-        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+        } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
             //an error occured but we can resolve it
             Log.d(TAG, "isServicesOK: an error occured but we can fix it");
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
@@ -126,20 +122,17 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             } else {
                 isLocationPermissionGranted = true;
-                Log.d(TAG,"Location permissions granted.");
+                Log.d(TAG, "Location permissions granted.");
             }
         }
     }
 
     @Override
     public void onBackPressed() {       //this overwrites the action of the back button to close the drawer if it is open rather than exiting the app
-        if (drawer.isDrawerOpen(GravityCompat.START))
-        {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }
-        else {
-            if(createnote.isVisible())
-            {
+        } else {
+            if (createnote.isVisible()) {
                 navigationView.setCheckedItem(R.id.nav_notes);
             }
             super.onBackPressed();
@@ -151,8 +144,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         if (!deleteNote) {
             shownotes.createNote(note);      //passes the data from the createnote fragment to the shownotes function to create the note
         }                                    //this avoids duplication of variables or having to run parallel viewmodels which is far more complicated
-        else
-        {
+        else {
             shownotes.deleteNote(note);
         }
         navigationView.setCheckedItem(R.id.nav_notes);
@@ -160,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
 
     @Override
     public void editNoteFromNotes(final Note editedNote) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();   //initialises the fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, createnote).addToBackStack(null).commit();   //initialises the fragment
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
@@ -172,27 +164,23 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId())
-        {
+        switch (item.getItemId()) {
             case R.id.nav_newnote:
+                 if (createnote.isVisible())
+                 {
+                    getSupportFragmentManager().popBackStackImmediate();    //stops the fragment "looping" causing the app to crash
+                 }
                 //addToBackStack(null) means back button takes the user back to previous fragment
-                //runs on a new thread to prevent stuttering
-                new Thread(new Runnable() {
-                    public void run() {
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,createnote).addToBackStack(null).commit();
-                    }
-                }).start();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, createnote).addToBackStack(null).commit();
+                createnote.newNote();       //clears the text fields for a new note to be written
                 break;
             case R.id.nav_notes:
-                if (getSupportFragmentManager().getBackStackEntryCount() > 0)
-                {
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                     //this clears the backstack then goes back to the shownotes fragment to prevent a huge backstack
                     getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).commit();
                     break;
-                }
-                else
-                {
+                } else {
                     break;
                 }
         }

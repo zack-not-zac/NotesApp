@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/colorBackground"
     tools:context=".fragment_createnote">
 
     <EditText
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-light"
         android:hint="Note Title"
-        android:inputType="text"
+        android:inputType="textMultiLine"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         android:textColorHint="@android:color/white"
@@ -26,7 +26,7 @@
         android:layout_below="@+id/edittxt_title"
         android:layout_marginTop="0dp"
         android:fontFamily="sans-serif-thin"
-        android:hint="Note Description"
+        android:hint="Add Description"
         android:textColorHint="@android:color/white"
         android:theme="@style/AppTheme.LighterEditText"
         android:inputType="textMultiLine"

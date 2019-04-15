@@ -72,7 +72,7 @@ public class fragment_shownotes extends Fragment {
                 noteVM.insert(newNote);     //db will just replace note if it exists, meaning that the app doesn't need to know if it exists already
                 Toast.makeText(getContext(), "Note Saved", Toast.LENGTH_SHORT).show();      //takes the note from the createnote fragment and saves it to the db
             }
-        }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
+        }, 100);   //50ms delay to allow the fragment to fully initialise before running the code
     }
 
     public void deleteNote(final Note note){

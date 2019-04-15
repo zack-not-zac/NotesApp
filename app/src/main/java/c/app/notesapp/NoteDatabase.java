@@ -49,8 +49,21 @@ abstract class NoteDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            noteDao.insert(new Note("Title 1", "Desc 1"));
-            noteDao.insert(new Note("Title 2", "Desc 2"));
+            noteDao.insert(new Note("Remember This", "Thing to remember"));
+            //Location example
+            Note note = new Note("Parked Here", null);
+            note.setLatitude(56.463066);
+            note.setLongitude(-2.973907);
+            noteDao.insert(note);
+            //multi-line example
+            noteDao.insert(new Note("My Life Story: A short novel by the creator of this app.","Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
+                    "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Commodo ullamcorper a lacus vestibulum sed. " +
+                    "Erat pellentesque adipiscing commodo elit at imperdiet dui accumsan. Urna condimentum mattis pellentesque id nibh tortor id. " +
+                    "Lacus luctus accumsan tortor posuere ac ut consequat semper. Cras semper auctor neque vitae tempus quam pellentesque nec nam. " +
+                    "Platea dictumst quisque sagittis purus sit. Pellentesque habitant morbi tristique senectus et netus et. Fames ac turpis egestas " +
+                    "integer eget aliquet nibh. Quisque non tellus orci ac auctor. Convallis a cras semper auctor neque vitae. Sit amet tellus cras adipiscing " +
+                    "enim eu turpis egestas pretium. Aliquet nibh praesent tristique magna sit amet purus gravida. Eu mi bibendum neque egestas. " +
+                    "Quis auctor elit sed vulputate."));
             return null;
         }
     }

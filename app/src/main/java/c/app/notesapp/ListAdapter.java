@@ -1,5 +1,6 @@
 package c.app.notesapp;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.NoteViewHolder
         Note note = notes.get(position);
         //sets the values of the TextViews in the note_layout
         holder.title_textview.setText(note.getTitle());
-        holder.desc_textview.setText(note.getDescription());
+        if (note.getDescription() == null) {
+            holder.desc_textview.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.desc_textview.setText(note.getDescription());
+        }
         holder.id_textview.setText("ID: " + Integer.toString(note.getId()));        //TODO: remove this once debugging complete
     }
 
@@ -42,19 +49,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.NoteViewHolder
         notifyDataSetChanged();
     }
 
-    public void removeItem(Note note)
-    {
-        for(int x = 0; x < notes.size(); x++)
-        {
-            if((notes.get(x)).getId() == note.getId())
-            {
+    public void removeItem(Note note) {
+        for (int x = 0; x < notes.size(); x++) {
+            if ((notes.get(x)).getId() == note.getId()) {
                 notifyItemRemoved(x);
             }
         }
     }
 
-    public Note getNote(int pos)
-    {
+    public Note getNote(int pos) {
         Note note = notes.get(pos);
         return note;
     }

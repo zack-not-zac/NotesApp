@@ -49,10 +49,13 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
     //for mapview & location
     private FusedLocationProviderClient locationProviderClient;
     private Location deviceLocation = null;
+    private double noteLat = 0.0;
+    private double noteLng = 0.0;
     private MapView mapView;
     private GoogleMap note_googleMap;
     private static final int PERMISSION_REQUEST_CODE = 1;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private static final float mapZoomLevel = 17;
 
     public interface onNewNoteCreatedListener {
         void sendNoteFromCreateNote(Note newNote, boolean deleteNote);
@@ -109,9 +112,9 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
         String title = editTextTitle.getText().toString();
         String desc = editTextDesc.getText().toString();
 
-        if (title.trim().isEmpty() || desc.trim().isEmpty())     //dont save the note if it is empty (trim removes empty spaces)
+        if (title.trim().isEmpty())     //dont save the note if it is empty (trim removes empty spaces)
         {
-            Toast.makeText(getContext(), "Cannot add an empty note!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Note title cannot be empty!", Toast.LENGTH_SHORT).show();
             return;
         } else {
             //send note to shownotes to be saved in db
@@ -119,6 +122,12 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
 
             if (id != -1) {
                 newNote.setId(id);      //sets the id if a note was passed into the editNote function
+            }
+
+            if(noteLat != 0.0 && noteLng != 0.0)
+            {
+                newNote.setLatitude(noteLat);
+                newNote.setLongitude(noteLng);
             }
 
             if (deviceLocation != null)
@@ -151,11 +160,14 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
 
                 if (note.getLatitude() != 0.0 && note.getLongitude() != 0.0)
                 {
-                    LatLng pos = new LatLng(note.getLatitude(),note.getLongitude());
+                    noteLat = note.getLatitude();
+                    noteLng = note.getLongitude();
+
+                    LatLng pos = new LatLng(noteLat,noteLng);
 
                     mapView.setVisibility(View.VISIBLE);
                     note_googleMap.addMarker(new MarkerOptions().position(pos).title(note.getTitle()));
-                    note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 20));    //zooms in on a specific part of the map
+                    note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, mapZoomLevel));    //zooms in on a specific part of the map
                 }
 
                 editTextTitle.setText(title);
@@ -229,7 +241,7 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
 
                         LatLng pos = new LatLng(location.getLatitude(),location.getLongitude());
                         note_googleMap.addMarker(new MarkerOptions().position(pos).title("New Marker"));
-                        note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 20));     //zooms in on a specific part of the map
+                        note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, mapZoomLevel));     //zooms in on a specific part of the map
 
                         deviceLocation = location;
                     }
