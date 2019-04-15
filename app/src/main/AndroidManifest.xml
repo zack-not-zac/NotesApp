@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".WebViewActivity" />
 
         <!-- to generate your own API key follow this tutorial: https://www.youtube.com/watch?v=lBW58tPLn-A&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=3 -->
         <meta-data

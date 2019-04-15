@@ -183,6 +183,9 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
                 } else {
                     break;
                 }
+            case R.id.nav_webview:
+                Intent intent = new Intent(this,WebViewActivity.class);
+                startActivity(intent);
         }
         drawer.closeDrawer(GravityCompat.START);
 
