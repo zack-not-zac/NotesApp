@@ -1,6 +1,5 @@
 package c.app.notesapp;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.NoteViewHolder
         {
             holder.desc_textview.setText(note.getDescription());
         }
-        holder.id_textview.setText("ID: " + Integer.toString(note.getId()));        //TODO: remove this once debugging complete
+        holder.id_textview.setText("ID: " + note.getId());        //TODO: remove this once debugging complete
     }
 
     @Override

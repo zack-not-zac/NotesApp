@@ -21,7 +21,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -53,7 +52,6 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
     private double noteLng = 0.0;
     private MapView mapView;
     private GoogleMap note_googleMap;
-    private static final int PERMISSION_REQUEST_CODE = 1;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private static final float mapZoomLevel = 17;
 

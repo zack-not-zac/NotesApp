@@ -3,14 +3,12 @@ package c.app.notesapp;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -20,11 +18,9 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -36,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     private NavigationView navigationView;
 
     //location variables. Location code based off tutorial from: https://www.youtube.com/watch?v=1f4b2-Y_q2A&list=PLgCYzUzKIBE-SZUrVOsbYMzH7tPigT3gi&index=4
-    private static final int PERMISSIONS_REQUEST_ENABLE_GPS = 1;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
     private static final int ERROR_DIALOG_REQUEST = 3;
     private boolean isLocationPermissionGranted = false;
