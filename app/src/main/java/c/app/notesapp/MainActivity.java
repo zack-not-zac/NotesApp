@@ -1,8 +1,10 @@
 package c.app.notesapp;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -128,9 +130,28 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (createnote.isVisible()) {
-                navigationView.setCheckedItem(R.id.nav_notes);
+                //creates a confirmation dialog to ask the user if they want to save the note.
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Changes will not be saved, do you want to save changes?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                createnote.saveNote();
+                                MainActivity.super.onBackPressed();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                navigationView.setCheckedItem(R.id.nav_notes);
+                                MainActivity.super.onBackPressed();
+                            }
+                        });
+
+                AlertDialog confirmDialog = builder.create();
+                confirmDialog.show();
             }
-            super.onBackPressed();
         }
     }
 

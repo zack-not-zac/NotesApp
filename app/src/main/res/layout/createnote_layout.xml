@@ -1,42 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/colorBackground"
-    tools:context=".fragment_createnote">
+    android:padding="16dp"
+    android:id="@+id/noteLinearLayout"
+    android:orientation="vertical"
+    tools:context=".fragment_createnote"
+    android:weightSum="2">
 
-    <EditText
-        android:id="@+id/edittxt_title"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-light"
-        android:hint="Note Title"
-        android:inputType="textMultiLine"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        android:textColorHint="@android:color/white"
-        android:theme="@style/AppTheme.LighterEditText"/>
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:id="@+id/noteRelativeLayout">
 
-    <EditText
-        android:id="@+id/edittxt_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edittxt_title"
-        android:layout_marginTop="0dp"
-        android:fontFamily="sans-serif-thin"
-        android:hint="Add Description"
-        android:textColorHint="@android:color/white"
-        android:theme="@style/AppTheme.LighterEditText"
-        android:inputType="textMultiLine"
-        android:textColor="@android:color/white" />
+        <EditText
+            android:id="@+id/edittxt_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:hint="Note Title"
+            android:inputType="textMultiLine"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="24sp"
+            android:theme="@style/AppTheme.LighterEditText" />
+
+        <EditText
+            android:id="@+id/edittxt_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edittxt_title"
+            android:layout_marginTop="0dp"
+            android:fontFamily="sans-serif-thin"
+            android:hint="Add Description"
+            android:inputType="textMultiLine"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:theme="@style/AppTheme.LighterEditText" />
+
+    </RelativeLayout>
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/note_mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/edittxt_description"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:layout_weight="1"/>
 
-</RelativeLayout>
+</LinearLayout>

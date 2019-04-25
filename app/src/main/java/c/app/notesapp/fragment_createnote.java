@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -54,6 +56,7 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
     private GoogleMap note_googleMap;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private static final float mapZoomLevel = 17;
+    private View v;
 
     public interface onNewNoteCreatedListener {
         void sendNoteFromCreateNote(Note newNote, boolean deleteNote);
@@ -62,7 +65,7 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.createnote_layout, container, false);
+        v = inflater.inflate(R.layout.createnote_layout, container, false);
 
         editTextTitle = v.findViewById(R.id.edittxt_title);
         editTextDesc = v.findViewById(R.id.edittxt_description);
@@ -78,16 +81,37 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
     }
 
     //Maps code based on tutorial from: https://www.youtube.com/watch?v=118wylgD_ig
-    private void GoogleMapInit(Bundle savedInstanceState)
-    {
+    private void GoogleMapInit(Bundle savedInstanceState) {
         Bundle mapViewBundle = null;
-        if(savedInstanceState != null)
-        {
+        if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
         }
         mapView.onCreate(mapViewBundle);
 
         mapView.getMapAsync(this);
+    }
+
+    private void fullscreenNoteText() {
+        //sets the text to take up the whole page if a note does not have a map location.
+        RelativeLayout layout = v.findViewById(R.id.noteRelativeLayout);
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                2.0f
+        );
+        layout.setLayoutParams(param);
+    }
+
+    private void noteHasMapView()
+    {
+        //sets the layout weight of the text fields back to half the page when a map is about to display
+        RelativeLayout layout = v.findViewById(R.id.noteRelativeLayout);
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                1.0f
+        );
+        layout.setLayoutParams(param);
     }
 
     public void newNote()
@@ -98,6 +122,8 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
             public void run() {                     //as before the data was being passed and set before the fragment fully initialised by MainAcitivity
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Add New Note");
 
+                fullscreenNoteText();
+
                 editTextTitle.setText("");
                 editTextDesc.setText("");
 
@@ -106,7 +132,7 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
         }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
     }
 
-    private void saveNote() {
+    public void saveNote() {
         String title = editTextTitle.getText().toString();
         String desc = editTextDesc.getText().toString();
 
@@ -122,14 +148,12 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
                 newNote.setId(id);      //sets the id if a note was passed into the editNote function
             }
 
-            if(noteLat != 0.0 && noteLng != 0.0)
-            {
+            if (noteLat != 0.0 && noteLng != 0.0) {
                 newNote.setLatitude(noteLat);
                 newNote.setLongitude(noteLng);
             }
 
-            if (deviceLocation != null)
-            {
+            if (deviceLocation != null) {
                 newNote.setLatitude(deviceLocation.getLatitude());
                 newNote.setLongitude(deviceLocation.getLongitude());
             }
@@ -156,16 +180,19 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
 
                 id = note.getId();
 
-                if (note.getLatitude() != 0.0 && note.getLongitude() != 0.0)
-                {
+                if (note.getLatitude() != 0.0 && note.getLongitude() != 0.0) {
                     noteLat = note.getLatitude();
                     noteLng = note.getLongitude();
 
-                    LatLng pos = new LatLng(noteLat,noteLng);
+                    noteHasMapView();
+
+                    LatLng pos = new LatLng(noteLat, noteLng);
 
                     mapView.setVisibility(View.VISIBLE);
                     note_googleMap.addMarker(new MarkerOptions().position(pos).title(note.getTitle()));
                     note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, mapZoomLevel));    //zooms in on a specific part of the map
+                } else {
+                    fullscreenNoteText();
                 }
 
                 editTextTitle.setText(title);
@@ -230,14 +257,17 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
             case R.id.location_btn: //take current lattitude and longitude and save it to deviceLocation variable
                 //location code based on tutorial from: https://www.youtube.com/watch?v=XQJiiuk8Feo
                 if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getContext(),"Cannot access location. Check location permissions in your system settings and try again!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Cannot access location. Check location permissions in your system settings and try again!", Toast.LENGTH_SHORT).show();
                 }
                 locationProviderClient.getLastLocation().addOnSuccessListener((Activity) getContext(), new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
+
+                        noteHasMapView();
+
                         mapView.setVisibility(View.VISIBLE);        //shows the map once the button is clicked.
 
-                        LatLng pos = new LatLng(location.getLatitude(),location.getLongitude());
+                        LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
                         note_googleMap.addMarker(new MarkerOptions().position(pos).title("New Marker"));
                         note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, mapZoomLevel));     //zooms in on a specific part of the map
 
