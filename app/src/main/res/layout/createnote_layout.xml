@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
-            android:hint="Note Title"
+            android:hint="@string/note_title"
             android:inputType="textMultiLine"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
@@ -35,7 +35,7 @@
             android:layout_below="@+id/edittxt_title"
             android:layout_marginTop="0dp"
             android:fontFamily="sans-serif-thin"
-            android:hint="Add Description"
+            android:hint="@string/note_description"
             android:inputType="textMultiLine"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
@@ -47,7 +47,6 @@
         android:id="@+id/note_mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/edittxt_description"
         android:visibility="gone"
         android:layout_weight="1"/>
 

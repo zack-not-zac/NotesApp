@@ -3,5 +3,8 @@
     <string name="nav_drawer_open">Open Navigation Drawer</string>
     <string name="nav_drawer_close">Close Navigation Drawer</string>
 
+    <string name="note_title">Note Title</string>
+    <string name="note_description">Add Note Description</string>
+
     <string name="google_maps_api_key">REDACTED</string>
 </resources>

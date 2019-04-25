@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
                 }
             case R.id.nav_webview:
                 Intent intent = new Intent(this,WebViewActivity.class);
+                intent.putExtra("URL","https://github.com/zack-not-zac/NotesApp");
                 startActivity(intent);
         }
         drawer.closeDrawer(GravityCompat.START);
