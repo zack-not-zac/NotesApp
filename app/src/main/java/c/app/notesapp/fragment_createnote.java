@@ -34,7 +34,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-public class fragment_createnote extends Fragment implements OnMapReadyCallback {
+class fragment_createnote extends Fragment implements OnMapReadyCallback {
 
     //for UI stuff
     private EditText editTextTitle;
@@ -102,8 +102,7 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
         layout.setLayoutParams(param);
     }
 
-    private void noteHasMapView()
-    {
+    private void noteHasMapView() {
         //sets the layout weight of the text fields back to half the page when a map is about to display
         RelativeLayout layout = v.findViewById(R.id.noteRelativeLayout);
         LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
@@ -114,7 +113,7 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
         layout.setLayoutParams(param);
     }
 
-    public void newNote()
+    void newNote()
     //made this function so that clicking "Add New Note" in the navbar clears the text fields
     {
         Handler handler = new Handler();
@@ -128,18 +127,20 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
                 editTextDesc.setText("");
 
                 id = -1;
+
+                noteLat = 0.0;
+                noteLng = 0.0;
             }
         }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
     }
 
-    public void saveNote() {
+    void saveNote() {
         String title = editTextTitle.getText().toString();
         String desc = editTextDesc.getText().toString();
 
         if (title.trim().isEmpty())     //dont save the note if it is empty (trim removes empty spaces)
         {
             Toast.makeText(getContext(), "Note title cannot be empty!", Toast.LENGTH_SHORT).show();
-            return;
         } else {
             //send note to shownotes to be saved in db
             Note newNote = new Note(title, desc);
@@ -163,10 +164,15 @@ public class fragment_createnote extends Fragment implements OnMapReadyCallback 
             //set edittext items back to empty once note has been saved
             editTextTitle.setText("");
             editTextDesc.setText("");
+
+            //reset variables
+            id = -1;
+            noteLat = 0.0;
+            noteLng = 0.0;
         }
     }
 
-    public void editNote(final Note note) {   //inserts the note data into the text views. The app then just calls saveNote as normal, then the DAO replaces the object if a conflict exists
+    void editNote(final Note note) {   //inserts the note data into the text views. The app then just calls saveNote as normal, then the DAO replaces the object if a conflict exists
         //if it does exist, then the note will appear edited but it is actually just replaced. Otherwise, it will be created.
 
         Handler handler = new Handler();

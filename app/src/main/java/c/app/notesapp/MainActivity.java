@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         return false;
     }
 
-    public boolean isMapsEnabled() {
+    private boolean isMapsEnabled() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         return true;
     }
 
-    public boolean isServicesEnabled() {
+    private boolean isServicesEnabled() {
         Log.d(TAG, "isServicesEnabled: checking google services version");
 
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         return true;
     }
 
-    public void request_permissions() {
+    private void request_permissions() {
         if (checkMapServices()) {
             if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 createnote.saveNote();
+                                navigationView.setCheckedItem(R.id.nav_notes);
                                 MainActivity.super.onBackPressed();
                             }
                         })
@@ -179,6 +180,11 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     }
 
     @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_newnote:
@@ -192,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
                 break;
             case R.id.nav_notes:
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                    //this clears the backstack then goes back to the shownotes fragment to prevent a huge backstack
+                    //this clears the backstack then goes back to the shownotes fragment to prevent multiple instances of each fragment in the backstack
                     getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).commit();
                     break;
@@ -200,9 +206,13 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
                     break;
                 }
             case R.id.nav_webview:
-                Intent intent = new Intent(this,WebViewActivity.class);
-                intent.putExtra("URL","https://github.com/zack-not-zac/NotesApp");
-                startActivity(intent);
+                final Intent intent = new Intent(this,WebViewActivity.class).putExtra("URL","https://github.com/zack-not-zac/NotesApp");
+                new Thread(new Runnable() {
+                    public void run() {
+                        // starts a new thread to display the webview to prevent stuttering
+                        startActivity(intent);
+                    }
+                }).start();
         }
         drawer.closeDrawer(GravityCompat.START);
 

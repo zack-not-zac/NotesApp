@@ -8,9 +8,9 @@ import java.util.List;
 import androidx.lifecycle.LiveData;
 
 //This repository is used to handle the multi-threading of the db tasks
-public class NoteRepo {
-    private NoteDao noteDao;
-    private LiveData<List<Note>> notes;
+class NoteRepo {
+    private final NoteDao noteDao;
+    private final LiveData<List<Note>> notes;
 
     public NoteRepo (Application app)
     {
@@ -47,7 +47,7 @@ public class NoteRepo {
     //ASynchronous tasks must be used to use multi-threading and create a mutex so that multiple threads don't update the table at once
     private static class InsertNoteAsyncTask extends AsyncTask<Note, Void, Void>
     {
-        private NoteDao noteDao;
+        private final NoteDao noteDao;
 
         private InsertNoteAsyncTask (NoteDao noteDao){this.noteDao = noteDao;}
 
@@ -60,7 +60,7 @@ public class NoteRepo {
 
     private static class UpdateNoteAsyncTask extends AsyncTask<Note, Void, Void>
     {
-        private NoteDao noteDao;
+        private final NoteDao noteDao;
 
         private UpdateNoteAsyncTask (NoteDao noteDao){this.noteDao = noteDao;}
 
@@ -73,7 +73,7 @@ public class NoteRepo {
 
     private static class DeleteNoteAsyncTask extends AsyncTask<Note, Void, Void>
     {
-        private NoteDao noteDao;
+        private final NoteDao noteDao;
 
         private DeleteNoteAsyncTask (NoteDao noteDao){this.noteDao = noteDao;}
 
@@ -86,7 +86,7 @@ public class NoteRepo {
 
     private static class DeleteAllAsyncTask extends AsyncTask<Void, Void, Void>
     {
-        private NoteDao noteDao;
+        private final NoteDao noteDao;
 
         private DeleteAllAsyncTask (NoteDao noteDao){this.noteDao = noteDao;}
 

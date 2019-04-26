@@ -19,7 +19,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class fragment_shownotes extends Fragment {
+class fragment_shownotes extends Fragment {
     private NoteViewModel noteVM;           //variable for the viewmodel of the app
     private EditNoteListener listener;
     private ListAdapter adapter;

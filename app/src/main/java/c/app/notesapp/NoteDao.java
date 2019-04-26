@@ -11,7 +11,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 @Dao
-public interface NoteDao {
+interface NoteDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Note note);
