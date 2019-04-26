@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +38,28 @@ import androidx.fragment.app.Fragment;
 
 class fragment_createnote extends Fragment implements OnMapReadyCallback {
 
+    //for logging
+    private static final String TAG = "createnote";
+
+    //for detecting changes in notes
+    private boolean isNoteChanged = false;
+    private TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            isNoteChanged = true;
+        }
+    };
+
     //for UI stuff
     private EditText editTextTitle;
     private EditText editTextDesc;
@@ -57,10 +81,6 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private static final float mapZoomLevel = 17;
     private View v;
-
-    public interface onNewNoteCreatedListener {
-        void sendNoteFromCreateNote(Note newNote, boolean deleteNote);
-    }
 
     @Nullable
     @Override
@@ -111,11 +131,12 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
                 1.0f
         );
         layout.setLayoutParams(param);
+
+        mapView.setVisibility(View.VISIBLE);        //shows the map once the button is clicked.
     }
 
-    void newNote()
-    //made this function so that clicking "Add New Note" in the navbar clears the text fields
-    {
+    void newNote() {
+        //made this function so that clicking "Add New Note" in the navbar clears the text fields
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
             public void run() {                     //as before the data was being passed and set before the fragment fully initialised by MainAcitivity
@@ -126,12 +147,17 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
                 editTextTitle.setText("");
                 editTextDesc.setText("");
 
-                id = -1;
-
-                noteLat = 0.0;
-                noteLng = 0.0;
+                editTextTitle.addTextChangedListener(textWatcher);
+                editTextDesc.addTextChangedListener(textWatcher);
             }
         }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
+
+        id = -1;
+
+        noteLat = 0.0;
+        noteLng = 0.0;
+
+        isNoteChanged = false;
     }
 
     void saveNote() {
@@ -169,11 +195,16 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
             id = -1;
             noteLat = 0.0;
             noteLng = 0.0;
+
+            clearTextListeners();
         }
     }
 
-    void editNote(final Note note) {   //inserts the note data into the text views. The app then just calls saveNote as normal, then the DAO replaces the object if a conflict exists
+    void editNote(final Note note) {
+        //inserts the note data into the text views. The app then just calls saveNote as normal, then the DAO replaces the object if a conflict exists
         //if it does exist, then the note will appear edited but it is actually just replaced. Otherwise, it will be created.
+
+
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {        //this creates a small delay between the fragment call and the data being inputted
@@ -194,7 +225,6 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
 
                     LatLng pos = new LatLng(noteLat, noteLng);
 
-                    mapView.setVisibility(View.VISIBLE);
                     note_googleMap.addMarker(new MarkerOptions().position(pos).title(note.getTitle()));
                     note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, mapZoomLevel));    //zooms in on a specific part of the map
                 } else {
@@ -203,9 +233,18 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
 
                 editTextTitle.setText(title);
                 editTextDesc.setText(desc);
+
+                editTextTitle.addTextChangedListener(textWatcher);
+                editTextDesc.addTextChangedListener(textWatcher);
+
+                isNoteChanged = false;
             }
         }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
 
+    }
+
+    boolean returnNoteChangedStatus() {
+        return isNoteChanged;
     }
 
     private void deleteNote() {
@@ -221,6 +260,16 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
         //set edittext items back to empty once note has been deleted
         editTextTitle.setText("");
         editTextDesc.setText("");
+    }
+
+    public void clearTextListeners()
+    {
+        editTextTitle.removeTextChangedListener(textWatcher);
+        editTextDesc.removeTextChangedListener(textWatcher);
+    }
+
+    public interface onNewNoteCreatedListener {
+        void sendNoteFromCreateNote(Note newNote, boolean deleteNote);
     }
 
     //for fragment communication
@@ -271,13 +320,13 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
 
                         noteHasMapView();
 
-                        mapView.setVisibility(View.VISIBLE);        //shows the map once the button is clicked.
-
                         LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
                         note_googleMap.addMarker(new MarkerOptions().position(pos).title("New Marker"));
                         note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, mapZoomLevel));     //zooms in on a specific part of the map
 
                         deviceLocation = location;
+
+                        isNoteChanged = true;
                     }
                 });
                 return true;
@@ -286,6 +335,7 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    //for MapView
     @Override
     public void onResume() {
         super.onResume();

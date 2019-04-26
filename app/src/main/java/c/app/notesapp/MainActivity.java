@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         return false;
     }
 
-    private boolean isMapsEnabled() {
+    public boolean isMapsEnabled() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         return true;
     }
 
-    private boolean isServicesEnabled() {
+    public boolean isServicesEnabled() {
         Log.d(TAG, "isServicesEnabled: checking google services version");
 
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         return true;
     }
 
-    private void request_permissions() {
+    public void request_permissions() {
         if (checkMapServices()) {
             if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -130,28 +130,37 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (createnote.isVisible()) {
-                //creates a confirmation dialog to ask the user if they want to save the note.
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Changes will not be saved, do you want to save changes?")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                createnote.saveNote();
-                                navigationView.setCheckedItem(R.id.nav_notes);
-                                MainActivity.super.onBackPressed();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                navigationView.setCheckedItem(R.id.nav_notes);
-                                MainActivity.super.onBackPressed();
-                            }
-                        });
+                if (createnote.returnNoteChangedStatus()) {
+                    //creates a confirmation dialog to ask the user if they want to save the note.
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Changes will not be saved, do you want to save changes?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    createnote.saveNote();
+                                    navigationView.setCheckedItem(R.id.nav_notes);
+                                    MainActivity.super.onBackPressed();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    navigationView.setCheckedItem(R.id.nav_notes);
+                                    MainActivity.super.onBackPressed();
+                                }
+                            });
 
-                AlertDialog confirmDialog = builder.create();
-                confirmDialog.show();
+                    AlertDialog confirmDialog = builder.create();
+                    confirmDialog.show();
+                }
+                else
+                {
+                    navigationView.setCheckedItem(R.id.nav_notes);
+                    super.onBackPressed();
+                }
+                //clears the text listeners to prevent memory leaks
+                createnote.clearTextListeners();
             }
         }
     }
