@@ -152,10 +152,13 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
             }
         }, 50);   //50ms delay to allow the fragment to fully initialise before running the code
 
+        //re-initialise variables
         id = -1;
 
         noteLat = 0.0;
         noteLng = 0.0;
+
+        deviceLocation = null;
 
         isNoteChanged = false;
     }
