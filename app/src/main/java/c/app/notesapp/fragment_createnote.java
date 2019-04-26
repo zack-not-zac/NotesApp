@@ -199,6 +199,8 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
             noteLat = 0.0;
             noteLng = 0.0;
 
+            deviceLocation = null;
+
             clearTextListeners();
         }
     }
@@ -219,6 +221,8 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
                 String desc = note.getDescription();
 
                 id = note.getId();
+
+                deviceLocation = null;
 
                 if (note.getLatitude() != 0.0 && note.getLongitude() != 0.0) {
                     noteLat = note.getLatitude();
@@ -315,23 +319,26 @@ class fragment_createnote extends Fragment implements OnMapReadyCallback {
             case R.id.location_btn: //take current lattitude and longitude and save it to deviceLocation variable
                 //location code based on tutorial from: https://www.youtube.com/watch?v=XQJiiuk8Feo
                 if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getContext(), "Cannot access location. Check location permissions in your system settings and try again!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Cannot access location. Check location permissions in your system settings and try again!", Toast.LENGTH_LONG).show();
                 }
-                locationProviderClient.getLastLocation().addOnSuccessListener((Activity) getContext(), new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
+                else {
 
-                        noteHasMapView();
+                    locationProviderClient.getLastLocation().addOnSuccessListener((Activity) getContext(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
 
-                        LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-                        note_googleMap.addMarker(new MarkerOptions().position(pos).title("New Marker"));
-                        note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, mapZoomLevel));     //zooms in on a specific part of the map
+                            noteHasMapView();
 
-                        deviceLocation = location;
+                            LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+                            note_googleMap.addMarker(new MarkerOptions().position(pos).title("New Marker"));
+                            note_googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, mapZoomLevel));     //zooms in on a specific part of the map
 
-                        isNoteChanged = true;
-                    }
-                });
+                            deviceLocation = location;
+
+                            isNoteChanged = true;
+                        }
+                    });
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

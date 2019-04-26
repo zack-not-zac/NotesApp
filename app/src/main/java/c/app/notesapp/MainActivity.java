@@ -59,14 +59,14 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        while (!isLocationPermissionGranted) {
-            request_permissions();
-        }
-
         if (savedInstanceState == null) {   //only runs this code if the app is running for the first time (instead of overwriting it if the lifecycle is replaced etc.)
             Log.d(TAG, "Building shownotes fragment...");
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, shownotes).commit();
             navigationView.setCheckedItem(R.id.nav_notes);
+        }
+
+        while (!isLocationPermissionGranted) {
+            request_permissions();
         }
     }
 
@@ -116,11 +116,14 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
         if (checkMapServices()) {
             if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            } else {
-                isLocationPermissionGranted = true;
-                Log.d(TAG, "Location permissions granted.");
+                if(ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                }
             }
+
+            isLocationPermissionGranted = true;
+            Log.d(TAG, "Location permissions granted.");
         }
     }
 
@@ -128,40 +131,41 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     public void onBackPressed() {       //this overwrites the action of the back button to close the drawer if it is open rather than exiting the app
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if (createnote.isVisible()) {
-                if (createnote.returnNoteChangedStatus()) {
-                    //creates a confirmation dialog to ask the user if they want to save the note.
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Changes will not be saved, do you want to save changes?")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    createnote.saveNote();
-                                    navigationView.setCheckedItem(R.id.nav_notes);
-                                    MainActivity.super.onBackPressed();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    navigationView.setCheckedItem(R.id.nav_notes);
-                                    MainActivity.super.onBackPressed();
-                                }
-                            });
+        } else if (shownotes.isVisible()) {
+            finish();
+            super.onBackPressed();
+        } else if (createnote.isVisible()) {
+            if (createnote.returnNoteChangedStatus()) {
+                //creates a confirmation dialog to ask the user if they want to save the note.
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Changes will not be saved, do you want to save changes?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                createnote.saveNote();
+                                navigationView.setCheckedItem(R.id.nav_notes);
+                                MainActivity.super.onBackPressed();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                navigationView.setCheckedItem(R.id.nav_notes);
+                                MainActivity.super.onBackPressed();
+                            }
+                        });
 
-                    AlertDialog confirmDialog = builder.create();
-                    confirmDialog.show();
-                }
-                else
-                {
-                    navigationView.setCheckedItem(R.id.nav_notes);
-                    super.onBackPressed();
-                }
-                //clears the text listeners to prevent memory leaks
-                createnote.clearTextListeners();
+                AlertDialog confirmDialog = builder.create();
+                confirmDialog.show();
+            } else {
+                navigationView.setCheckedItem(R.id.nav_notes);
+                super.onBackPressed();
             }
+            //clears the text listeners to prevent memory leaks
+            createnote.clearTextListeners();
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -197,10 +201,9 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_newnote:
-                 if (createnote.isVisible())
-                 {
+                if (createnote.isVisible()) {
                     getSupportFragmentManager().popBackStackImmediate();    //stops the fragment "looping" causing the app to crash
-                 }
+                }
                 //addToBackStack(null) means back button takes the user back to previous fragment
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, createnote).addToBackStack(null).commit();
                 createnote.newNote();       //clears the text fields for a new note to be written
@@ -215,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements fragment_createno
                     break;
                 }
             case R.id.nav_webview:
-                final Intent intent = new Intent(this,WebViewActivity.class).putExtra("URL","https://github.com/zack-not-zac/NotesApp");
+                final Intent intent = new Intent(this, WebViewActivity.class).putExtra("URL", "https://github.com/zack-not-zac/NotesApp");
                 new Thread(new Runnable() {
                     public void run() {
                         // starts a new thread to display the webview to prevent stuttering
